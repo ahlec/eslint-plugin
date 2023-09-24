@@ -12,6 +12,9 @@
   "files": [
     "dist/**/*.js"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "clean": "rimraf ./dist",
