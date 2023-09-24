@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "module": "esnext",
+    "target": "es5",
+    "rootDir": "src",
+    "outDir": "dist/",
+    "lib": ["es6", "dom", "es2019"],
+    "sourceMap": true,
+    "strictNullChecks": true
+  },
+  "exclude": ["node_modules"]
+}

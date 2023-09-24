@@ -3,10 +3,13 @@
   "version": "1.0.0",
   "packageManager": "yarn@3.6.3",
   "scripts": {
+    "build": "tsc",
     "format": "prettier . --write"
   },
   "devDependencies": {
-    "prettier": "^3.0.3"
+    "@types/node": "^20.6.5",
+    "prettier": "^3.0.3",
+    "typescript": "^5.2.2"
   },
   "prettier": {}
 }
