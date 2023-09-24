@@ -7,4 +7,4 @@ const plugin: ESLint.Plugin = {
   },
 };
 
-export default plugin;
+export = plugin;
