@@ -11,5 +11,13 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "sourceType": "script"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["tests/**/*"],
+      "env": {
+        "jest": true
+      }
+    }
+  ]
 }
