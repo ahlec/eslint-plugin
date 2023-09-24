@@ -1,5 +1,12 @@
 {
-    "name": "@ahlec/eslint-plugin",
-    "version": "1.0.0",
-    "packageManager": "yarn@3.6.3"
+  "name": "@ahlec/eslint-plugin",
+  "version": "1.0.0",
+  "packageManager": "yarn@3.6.3",
+  "scripts": {
+    "format": "prettier . --write"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.3"
+  },
+  "prettier": {}
 }
