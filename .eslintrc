@@ -12,6 +12,20 @@
   "parserOptions": {
     "sourceType": "script"
   },
+  "rules": {
+    "n/no-missing-import": [
+      "error",
+      {
+        "typescriptExtensionMap": [[".ts", ""]]
+      }
+    ],
+    "n/no-unpublished-import": [
+      "error",
+      {
+        "ignoreTypeImport": true
+      }
+    ]
+  },
   "overrides": [
     {
       "files": ["tests/**/*"],
