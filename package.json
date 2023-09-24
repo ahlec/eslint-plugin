@@ -5,8 +5,12 @@
   "engines": {
     "node": ">=16.0.0"
   },
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
   "files": [
-    "src/**/*"
+    "dist/**/*.js"
   ],
   "scripts": {
     "build": "tsc",
