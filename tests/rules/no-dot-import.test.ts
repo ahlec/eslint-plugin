@@ -19,14 +19,17 @@ createRuleTester().run("no-dot-import", NoDotImportRule, {
     {
       code: 'import * as foo from ".";',
       errors: [{ messageId: ERROR_MESSAGE_ID }],
+      output: 'import * as foo from "./index";',
     },
     {
       code: 'import ".";',
       errors: [{ messageId: ERROR_MESSAGE_ID }],
+      output: 'import "./index";',
     },
     {
       code: 'const x = require(".");',
       errors: [{ messageId: ERROR_MESSAGE_ID }],
+      output: 'const x = require("./index");',
     },
   ],
 });

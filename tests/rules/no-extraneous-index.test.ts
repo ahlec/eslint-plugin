@@ -21,14 +21,17 @@ createRuleTester().run("no-extraneous-index", NoExtraneousIndexRule, {
     {
       code: 'import * as foo from "../lib/index";',
       errors: [{ messageId: ERROR_MESSAGE_ID }],
+      output: 'import * as foo from "../lib";',
     },
     {
       code: 'import "./bar/index";',
       errors: [{ messageId: ERROR_MESSAGE_ID }],
+      output: 'import "./bar";',
     },
     {
       code: 'const x = require("../lib/index");',
       errors: [{ messageId: ERROR_MESSAGE_ID }],
+      output: 'const x = require("../lib");',
     },
   ],
 });

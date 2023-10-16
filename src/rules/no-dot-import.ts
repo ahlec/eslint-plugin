@@ -10,10 +10,12 @@ export const NoDotImportRule: Rule.RuleModule = {
         context.report({
           node: statement.node,
           messageId: ERROR_MESSAGE_ID,
+          fix: (fixer) => fixer.replaceText(statement.sourceNode, '"./index"'),
         });
       }
     }),
   meta: {
+    fixable: "code",
     messages: {
       [ERROR_MESSAGE_ID]: "Prefer importing from './index' instead",
     },

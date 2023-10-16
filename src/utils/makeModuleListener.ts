@@ -1,13 +1,34 @@
 import type * as ESTree from "estree";
 import type { Rule } from "eslint";
 
+type SimpleStringLiteral = ESTree.SimpleLiteral & { value: string };
+
 interface ModuleImport {
   node: ESTree.Node;
   type: "import" | "require";
   source: string;
+  sourceNode: SimpleStringLiteral;
 }
 
 type ProcessModuleFn = (statement: ModuleImport) => void;
+
+function assertIsSimpleStringLiteral(
+  literal: ESTree.Literal,
+): asserts literal is SimpleStringLiteral {
+  if (typeof literal.value !== "string") {
+    throw new Error(
+      `Unexpected encounter of ${typeof literal.value} in import source`,
+    );
+  }
+
+  if ("regex" in literal) {
+    throw new Error("Unexpected RegExpLiteral in import statement");
+  }
+
+  if ("bigint" in literal) {
+    throw new Error("Unexpected BigIntLiteral in import statement");
+  }
+}
 
 function makeModuleListener(
   this: void,
@@ -25,24 +46,22 @@ function makeModuleListener(
         return;
       }
 
+      assertIsSimpleStringLiteral(node.arguments[0]);
+
       process({
         node,
         type: "require",
         source: node.arguments[0].value,
+        sourceNode: node.arguments[0],
       });
     },
     ImportDeclaration: (node) => {
-      if (typeof node.source.value !== "string") {
-        throw new Error(
-          `Unexpected encounter of ${typeof node.source
-            .value} in import source`,
-        );
-      }
-
+      assertIsSimpleStringLiteral(node.source);
       process({
         node,
         type: "import",
         source: node.source.value,
+        sourceNode: node.source,
       });
     },
   };
