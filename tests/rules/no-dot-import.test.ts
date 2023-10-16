@@ -10,6 +10,10 @@ createRuleTester().run("no-dot-import", NoDotImportRule, {
     'import * as foo from "./some-file";',
     'import * as foo from "react";',
     'import * as foo from "@ahlec/lib";',
+    'const foo = require("./index");',
+    'const foo = require("./some-file");',
+    'require("react");',
+    'require("@ahlec/lib");',
   ],
   invalid: [
     {
@@ -18,6 +22,10 @@ createRuleTester().run("no-dot-import", NoDotImportRule, {
     },
     {
       code: 'import ".";',
+      errors: [{ messageId: ERROR_MESSAGE_ID }],
+    },
+    {
+      code: 'const x = require(".");',
       errors: [{ messageId: ERROR_MESSAGE_ID }],
     },
   ],

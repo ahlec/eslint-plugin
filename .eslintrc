@@ -16,6 +16,7 @@
     "n/no-missing-import": [
       "error",
       {
+        "allowModules": ["estree"],
         "typescriptExtensionMap": [[".ts", ""]]
       }
     ],
