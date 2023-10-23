@@ -2,12 +2,11 @@ import { orderBy } from "lodash";
 import path from "path";
 import type { Rule } from "eslint";
 import { cleanImportPath } from "../utils/cleanImportPath";
+import { isRelativePathToParent } from "../utils/fs";
 import getAliases from "../utils/getAliases";
 import makeModuleListener from "../utils/makeModuleListener";
 
 export const ERROR_MESSAGE_ID = "prefer-alias";
-
-const REGEX_PARENT_NAV = /\.\.(\\|\/)/;
 
 export const PreferAliasForParentImportRule: Rule.RuleModule = {
   create: (context): Rule.RuleListener => {
@@ -17,7 +16,7 @@ export const PreferAliasForParentImportRule: Rule.RuleModule = {
     return makeModuleListener((statement) => {
       // This rule only applies to imports that use relative paths to
       // navigate to a parent directory
-      if (!REGEX_PARENT_NAV.test(statement.source)) {
+      if (!isRelativePathToParent(statement.source)) {
         return;
       }
 
