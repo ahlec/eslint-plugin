@@ -7,6 +7,8 @@ import { isIndexableObject } from "./typeguards";
 
 interface AliasDefinition {
   matchesAbsolute: (absoluteFilepath: string) => boolean;
+  matchesAlias: (aliasFilepath: string) => boolean;
+  convertToAbsolute: (aliasFilepath: string) => string;
   /**
    * @throws if the filepath isn't a match for this alias
    */
@@ -17,14 +19,53 @@ function explodePathPieces(filepath: string): readonly string[] {
   return filepath.split(/\\|\//);
 }
 
+function isAPrefixedWithB(a: readonly string[], b: readonly string[]): boolean {
+  for (let index = 0; index < b.length; ++index) {
+    if (a.length <= index) {
+      // Absolute path is too short to be a match
+      return false;
+    }
+
+    if (a[index] !== b[index]) {
+      // Paths differ
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function buildPathWithPrefixRemoved(
+  incPath: string,
+  prefixToRemove: readonly string[],
+  rootToUse: string,
+): string {
+  const pathPieces = explodePathPieces(incPath);
+  if (pathPieces.length < prefixToRemove.length) {
+    throw new Error();
+  }
+
+  if (pathPieces.length === prefixToRemove.length) {
+    return rootToUse;
+  }
+
+  return (
+    rootToUse +
+    path.sep +
+    pathPieces.slice(prefixToRemove.length).join(path.sep)
+  );
+}
+
 export function buildSingleFileAlias(
   alias: string,
   singleFileAbsolutePath: string,
 ): AliasDefinition {
   return {
+    convertToAbsolute: (): string => singleFileAbsolutePath,
     convertToAlias: (): string => alias,
     matchesAbsolute: (absoluteFilepath): boolean =>
       absoluteFilepath === singleFileAbsolutePath,
+    matchesAlias: (importAlias): boolean => importAlias === alias,
   };
 }
 
@@ -34,43 +75,19 @@ export function buildWildcardAlias(
 ): AliasDefinition {
   // Remove any trailing separators and/or the wildcard from the settings
   const baseAlias = trimEnd(rawAlias, "\\/*");
-  const rootPathPieces = explodePathPieces(
-    trimEnd(rootPathWithoutWildcard, "\\/*"),
-  );
+  const baseAliasPieces = explodePathPieces(baseAlias);
+  const rootPath = trimEnd(rootPathWithoutWildcard, "\\/*");
+  const rootPathPieces = explodePathPieces(rootPath);
 
   return {
-    convertToAlias: (absoluteFilepath): string => {
-      const absolutePathPieces = explodePathPieces(absoluteFilepath);
-      if (absolutePathPieces.length < rootPathPieces.length) {
-        throw new Error();
-      }
-
-      if (absolutePathPieces.length === rootPathPieces.length) {
-        return baseAlias;
-      }
-
-      return (
-        baseAlias +
-        path.sep +
-        absolutePathPieces.slice(rootPathPieces.length).join(path.sep)
-      );
-    },
-    matchesAbsolute: (absoluteFilepath): boolean => {
-      const absolutePathPieces = explodePathPieces(absoluteFilepath);
-      for (let index = 0; index < rootPathPieces.length; ++index) {
-        if (absolutePathPieces.length <= index) {
-          // Absolute path is too short to be a match
-          return false;
-        }
-
-        if (absolutePathPieces[index] !== rootPathPieces[index]) {
-          // Paths differ
-          return false;
-        }
-      }
-
-      return true;
-    },
+    convertToAbsolute: (aliasFilepath) =>
+      buildPathWithPrefixRemoved(aliasFilepath, baseAliasPieces, rootPath),
+    convertToAlias: (absoluteFilepath) =>
+      buildPathWithPrefixRemoved(absoluteFilepath, rootPathPieces, baseAlias),
+    matchesAlias: (alias) =>
+      isAPrefixedWithB(explodePathPieces(alias), baseAliasPieces),
+    matchesAbsolute: (absoluteFilepath) =>
+      isAPrefixedWithB(explodePathPieces(absoluteFilepath), rootPathPieces),
   };
 }
 

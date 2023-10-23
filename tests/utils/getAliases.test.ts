@@ -13,12 +13,13 @@ describe("buildSingleFileAlias", () => {
   describe.each<{
     alias: string;
     path: string;
-    excluded: readonly string[];
+    excludedAbsolutePaths: readonly string[];
+    excludedAliases: readonly string[];
   }>([
     {
       alias: "@myfile",
       path: "/home/root/code/foo/bar/baz.ts",
-      excluded: [
+      excludedAbsolutePaths: [
         "/home/foo",
         "/home/root/code/bar",
         "/",
@@ -27,6 +28,15 @@ describe("buildSingleFileAlias", () => {
         "/home/root/code/foo/bar",
         "/home/root/code/foo/bar/baz.tsx",
         "/home/root/code/foo/bar/baz/boop.ts",
+      ],
+      excludedAliases: [
+        "@myfile2",
+        "@myf",
+        "asdf",
+        "some-path/@myfile/hello",
+        "some-path/@myfile",
+        "@myfile/hello",
+        "@myfile.tsx",
       ],
     },
   ])("ALIAS: $path → $alias", (spec): void => {
@@ -42,9 +52,18 @@ describe("buildSingleFileAlias", () => {
       });
     });
 
-    describe.each(spec.excluded)("OUTSIDE: %s", (excluded): void => {
-      it("should identify the absolute path as NOT being included", () => {
-        expect(alias.matchesAbsolute(excluded)).toBe(false);
+    describe.each(spec.excludedAbsolutePaths)(
+      "OUTSIDE: %s",
+      (excluded): void => {
+        it("should identify the absolute path as NOT being included", () => {
+          expect(alias.matchesAbsolute(excluded)).toBe(false);
+        });
+      },
+    );
+
+    describe.each(spec.excludedAliases)("OUTSIDE: %s", (excluded): void => {
+      it("should identify the alias as NOT being included", () => {
+        expect(alias.matchesAlias(excluded)).toBe(false);
       });
     });
   });
@@ -55,7 +74,8 @@ describe("buildWildcardAlias", () => {
     alias: string;
     path: string;
     included: readonly IncludedAliasCase[];
-    excluded: readonly string[];
+    excludedAbsolutePaths: readonly string[];
+    excludedAliases: readonly string[];
   }>([
     {
       alias: "@foo",
@@ -78,12 +98,17 @@ describe("buildWildcardAlias", () => {
           expectedAlias: "@foo/some-file.log",
         },
       ],
-      excluded: [
+      excludedAbsolutePaths: [
         "/home/foo",
         "/home/root/code/bar",
         "/",
         "/home/root/code/football",
         "/home/root/code/foo.log",
+      ],
+      excludedAliases: [
+        "@football/foo",
+        "some-path/@foo/alias-in-middle",
+        "asdf",
       ],
     },
   ])("ALIAS: $path → $alias", (spec): void => {
@@ -99,11 +124,30 @@ describe("buildWildcardAlias", () => {
           included.expectedAlias,
         );
       });
+
+      it("should identify the alias path as included", () => {
+        expect(alias.matchesAlias(included.expectedAlias)).toBe(true);
+      });
+
+      it("should convert the alias to the expected absolute path", () => {
+        expect(alias.convertToAbsolute(included.expectedAlias)).toBe(
+          included.absolute,
+        );
+      });
     });
 
-    describe.each(spec.excluded)("OUTSIDE: %s", (excluded): void => {
-      it("should identify the absolute path as NOT being included", () => {
-        expect(alias.matchesAbsolute(excluded)).toBe(false);
+    describe.each(spec.excludedAbsolutePaths)(
+      "OUTSIDE: %s",
+      (excluded): void => {
+        it("should identify the absolute path as NOT being included", () => {
+          expect(alias.matchesAbsolute(excluded)).toBe(false);
+        });
+      },
+    );
+
+    describe.each(spec.excludedAliases)("OUTSIDE: %s", (excluded): void => {
+      it("should identify the alias as NOT being included", () => {
+        expect(alias.matchesAlias(excluded)).toBe(false);
       });
     });
   });
