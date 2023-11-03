@@ -15,6 +15,10 @@
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ahlec/eslint-plugin.git"
+  },
   "scripts": {
     "build": "tsc",
     "clean": "rimraf ./dist",
