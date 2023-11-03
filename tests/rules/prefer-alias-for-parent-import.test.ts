@@ -29,6 +29,10 @@ createRuleTester({
       code: 'import conf from "./conf.json";',
       filename: "/home/root/code/my-repo/src/foo/index.ts",
     },
+    {
+      code: 'import bar from "..";',
+      filename: "/home/root/code/my-repo/src/bar/child/index.ts",
+    },
   ],
   invalid: [
     {
@@ -54,6 +58,12 @@ createRuleTester({
       errors: [{ messageId: ERROR_MESSAGE_ID }],
       filename: "/home/root/code/my-repo/src/bar/index.ts",
       output: 'import foo from "@foo/myfile";',
+    },
+    {
+      code: 'import foo from "..";',
+      errors: [{ messageId: ERROR_MESSAGE_ID }],
+      filename: "/home/root/code/my-repo/src/foo/nested/index.ts",
+      output: 'import foo from "@foo";',
     },
   ],
 });
