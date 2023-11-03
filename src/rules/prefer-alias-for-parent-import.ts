@@ -4,6 +4,7 @@ import type { Rule } from "eslint";
 import { cleanImportPath } from "../utils/cleanImportPath";
 import { isRelativePathToParent } from "../utils/fs";
 import getAliases from "../utils/getAliases";
+import { getContextFilename } from "../utils/getContextFilename";
 import makeModuleListener from "../utils/makeModuleListener";
 
 export const ERROR_MESSAGE_ID = "prefer-alias";
@@ -11,7 +12,7 @@ export const ERROR_MESSAGE_ID = "prefer-alias";
 export const PreferAliasForParentImportRule: Rule.RuleModule = {
   create: (context): Rule.RuleListener => {
     const allAliases = getAliases(context.settings);
-    const currentDirectory = path.dirname(context.filename);
+    const currentDirectory = path.dirname(getContextFilename(context));
 
     return makeModuleListener((statement) => {
       // This rule only applies to imports that use relative paths to

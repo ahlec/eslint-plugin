@@ -3,6 +3,7 @@ import type { Rule } from "eslint";
 import { cleanImportPath } from "../utils/cleanImportPath";
 import { isRelativePathToParent } from "../utils/fs";
 import getAliases from "../utils/getAliases";
+import { getContextFilename } from "../utils/getContextFilename";
 import makeModuleListener from "../utils/makeModuleListener";
 
 export const ERROR_MESSAGE_ID = "prefer-relative";
@@ -10,7 +11,7 @@ export const ERROR_MESSAGE_ID = "prefer-relative";
 export const PreferRelativeForNestedImport: Rule.RuleModule = {
   create: (context): Rule.RuleListener => {
     const allAliases = getAliases(context.settings);
-    const currentDirectory = path.dirname(context.filename);
+    const currentDirectory = path.dirname(getContextFilename(context));
 
     return makeModuleListener((statement) => {
       // Find if there is any alias that match the path being imported
